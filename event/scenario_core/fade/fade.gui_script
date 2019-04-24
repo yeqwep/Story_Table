@@ -1,0 +1,99 @@
+-- フェード切り替えの関数
+function toggle_fade(self)
+    -- フェードアウトしてある時フェードイン開始
+    if self.faded == false then
+        -- フェードインしてある時フェードアウト開始
+        self.faded = true
+        msg.post('#', 'fade_in')
+    else
+        self.faded = false
+        msg.post('#', 'fade_out')
+    end
+end
+-- フェードアウトの関数
+function fade_out(self)
+    self.fading = true --フェード中
+    self.fading_timer = 100 --時間100にする
+    self.fading_out = true --アップデートで確認する用
+    self.pre_fade_color = gui.get_color(self.shade) --現在の色を記録
+end
+-- フェードインの関数
+function fade_in(self)
+    self.fading = true --フェード中
+    self.fading_timer = 0 --時間0にする
+    self.fading_in = true --アップデートで確認する用
+    self.pre_fade_color = gui.get_color(self.shade) --現在の色を記録
+end
+-- 最初に実行する関数
+function init(self)
+    msg.post('.', 'acquire_input_focus', {}) -- 入力可能にする
+    local color = vmath.vector4(0, 0, 0, 1) -- 色の設定　（黒色）
+    local width, height = gui.get_width(), gui.get_height() -- GUIの縦横幅
+    local position = vmath.vector3(width / 2, height / 2, 0) -- 位置
+    local size = vmath.vector3(width * 1, height * 1, 0) -- 大きさ
+    local shade = gui.new_box_node(position, size) -- フェード用の四角作成
+
+    gui.set_render_order(0) --GUIレイヤーの前後。別のGUI文字レイヤーを見せるため最下層の0にした
+    gui.set_adjust_mode(shade, gui.ADJUST_ZOOM) --アジャストモード　ウィンドウの大きさに合わせてズームする
+    gui.set_color(shade, color) --フェード用の四角の色を設定
+    -- フェード用の四角をupdateとかで使えるようにself.shadeに入れる
+    self.shade = shade
+
+    self.faded = false --toggle_fadeでフェードインとアウトの判定する用
+    self.fading = false --フェード中かどうか
+    self.fading_out = false --フェードアウトしたか
+    self.fading_in = false --フェードインしたか
+    self.fading_timer = 0 --フェード時間　透明度に連動するのでフェードアウトの時は減らしてフェードインの時は増やす
+    self.color_mod = vmath.vector4(0, 0, 0, 1) --フェードの色、透明度
+    -- 最初にフェードアウトする
+    fade_out(self)
+end
+--毎フレーム更新する関数
+function update(self, dt)
+    -- フェードアウトして時間が０以下になったらフェード用の四角を完全に透明にしてフェード終了
+    if (self.fading_timer < 0.1 and self.fading_timer > 0) or (self.fading_timer < 0) and self.fading_out == true then
+        self.fading_timer = 0 --時間0
+        self.fading_out = false --フェードアウトではない
+        self.fading = false --フェード終わり
+        self.color_mod.w = 0 --透明にしてる
+        gui.set_color(self.shade, self.color_mod) --透明度をフェードに反映
+    end
+    -- フェードアウト開始後しばらく時間と透明度を減らす
+    if self.fading_timer > 0 and self.fading_out == true then
+        self.color_mod = self.pre_fade_color --アップデートする前の色を入れる
+        self.color_mod.w = self.fading_timer * 0.01 --時間に合わせて透明度増やす
+        gui.set_color(self.shade, self.color_mod) --フェードの色を更新する
+        self.fading_timer = self.fading_timer - 60 * dt - (100 - self.fading_timer) / 6 --時間減らす
+    end
+    -- フェードインして時間が100以上になったらフェード用の四角を完全に表示して終了
+    if (self.fading_timer > 99.9 and self.fading_timer < 100) or (self.fading_timer > 100) and self.fading_in == true then
+        self.fading_timer = 100 --時間100
+        self.fading_in = false --フェードインではない
+        self.fading = false --フェード終わり
+        self.color_mod.w = 1 --完全に表示
+        gui.set_color(self.shade, self.color_mod) --透明度をフェードに反映
+    end
+    -- フェードイン開始後しばらく時間と透明度を増やす
+    if self.fading_timer < 100 and self.fading_in == true then
+        self.color_mod = self.pre_fade_color --アップデート前の色を入れる
+        self.color_mod.w = self.fading_timer * 0.01 --時間に合わせて透明度を減らす
+        gui.set_color(self.shade, self.color_mod) --フェードの色を更新する
+        self.fading_timer = self.fading_timer + 60 * dt + (100 - self.fading_timer) / 6 --時間増やす
+    end
+end
+--msg.postを受信した時発生する関数
+function on_message(self, message_id, message, sender)
+    -- hash("toggle_fade")を受信したらフェード切り替えて開始
+    if message_id == hash('toggle_fade') and self.fading == false then
+        toggle_fade(self)
+    end
+    -- hash("fade_in")を受信したらフェードイン開始
+    if message_id == hash('fade_in') and self.fading == false then
+        -- hash("fade_out")を受信したらフェードアウト開始
+        print('FADE_IN')
+        fade_in(self)
+    elseif message_id == hash('fade_out') and self.fading == false then
+        print('FADE_OUT')
+        fade_out(self)
+    end
+end

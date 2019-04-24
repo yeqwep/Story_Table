@@ -1,0 +1,137 @@
+local utf8 = require('event.scenario_core.utf8')
+-- ADV操作一時データ
+local caption = 0
+local show_words = ''
+local num_cha = 0
+local words = 0
+-- 読むフラグ
+local u_ok = false
+-- 読む速さ
+local read_time = 0
+local read_time_max = 1
+-- テキストに何か効果追加するとき
+local text_script = 0
+-- 表示する文字
+local name = ''
+local text = {}
+-- クリック可能なのを知らせるマークを右下に表示させるかどうか
+local function push_mark(self)
+    --プッシュマーク表示、アニメ開始
+    if u_ok == true then
+        local p_mark = gui.get_node('p_mark')
+        gui.set_enabled(p_mark, true)
+        gui.animate(p_mark, 'position.y', -60, gui.EASING_INSINE, 0.6, 0, nil, gui.PLAYBACK_LOOP_PINGPONG)
+    else
+        --プッシュマーク非表示、位置初期化
+        local p_mark = gui.get_node('p_mark')
+        gui.cancel_animation(p_mark, 'position.y')
+        gui.set_position(p_mark, vmath.vector3(580, -50, 0))
+        gui.set_enabled(p_mark, false)
+    end
+end
+
+local function inittext(self)
+    -- 初期化
+    caption = 0
+    show_words = ''
+    num_cha = 0
+    words = 0
+    u_ok = false
+    read_time = 0
+    text_script = 0
+    name = ''
+    text = {}
+    gui.set_text(gui.get_node('name'), name)
+    -- 次の文章読む前に文章を消す
+    for i = 1, 3, 1 do
+        local t = gui.get_node(string.format('textline_%s', i))
+        gui.set_text(t, '')
+    end
+end
+
+function init(self)
+    inittext(self)
+    push_mark(self)
+end
+
+function update(self, dt)
+    if u_ok == true then --読んでいいとき読む
+        if words <= num_cha then --一行の文字数より表示文字数が少ないとき
+            if read_time <= 0 then
+                show_words = utf8.utf8sub(text[caption], 0, words)
+                local t = gui.get_node(string.format('textline_%s', caption))
+                gui.set_text(t, show_words)
+                words = words + 1
+                read_time = read_time_max
+            elseif read_time > 0 then
+                read_time = read_time - 1
+            end
+        else --一行全部読んだら各変数リセットし次の行へ
+            words = 0
+            read_time = 0
+            show_words = ''
+            if caption < 3 then
+                caption = caption + 1
+                num_cha = utf8.utf8len(text[caption])
+            else
+                push_mark(self) --プッシュマーク表示
+                u_ok = false
+                -- シナリオスクリプトへ読み終わったこと報告
+                msg.post('/s_common/scenario', 'read_f')
+            end
+        end
+    end
+end
+
+local function read(self)
+    -- 次の文章読む前に文章を消す
+    for i = 1, 3, 1 do
+        local t = gui.get_node(string.format('textline_%s', i))
+        gui.set_text(t, '')
+    end
+    -- 1行目の文字数をセットする
+    num_cha = utf8.utf8len(text[1])
+    -- 人物名あればセットする
+    gui.set_text(gui.get_node('name'), name)
+    -- 表示文字一時保管用データを消す
+    show_words = ''
+    -- 一行目表示開始
+    caption = 1
+    -- テキストスクリプトある場合
+    -- if text_script == 0 then
+    --   u_ok = false
+    -- elseif text_script == 1 then
+    --   u_ok = true
+    -- end
+end
+
+-- 文章表示中にクリックすると読むのスキップして全文表示
+local function skip_click(self)
+    -- ３行全部表示
+    for i = 1, 3, 1 do
+        local t = gui.get_node(string.format('textline_%s', i))
+        gui.set_text(t, text[i])
+    end
+    -- 各テキスト用変数をリセットする
+    words = 0
+    read_time = 0
+    u_ok = false
+    -- シナリオスクリプトへ読み終わったこと報告
+    msg.post('/s_common/scenario', 'read_f')
+end
+
+function on_message(self, message_id, message, sender)
+    if message_id == hash('retext') then --シナリオデータから
+        -- シナリオデータから来たテキストを変数に入れる
+        text_script = message[1]
+        name = message[2]
+        text = {message[3], message[4], message[5]}
+    elseif message_id == hash('script_ok') then --シナリオスクリプトから
+        push_mark(self) --プッシュマーク非表示、位置初期化
+        read(self)
+        u_ok = true --文章読むの開始
+    elseif message_id == hash('skip_click') then --シナリオスクリプトから
+        push_mark(self) --プッシュマーク表示
+        skip_click(self)
+    end
+end

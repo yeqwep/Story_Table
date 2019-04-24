@@ -1,0 +1,36 @@
+local data = require ("main.data")
+
+function init(self)
+  msg.post(".", "acquire_input_focus")
+  -- 状態変更
+  data.state = data.STATE_SCENE
+  -- ロード済みのレベル一時保管　
+  self.loaded = -1
+  -- data.E_num = 0
+  -- コレクション名は固定
+  data.coll = "02event"
+-- イベントのアンロードとロード
+  loadevent(self)
+  print(data.coll)
+end
+
+function loadevent (self)
+  -- イベントから別イベントへ移動するときアンロード
+	if self.loaded > -1 then
+    print("event_unload"..self.loaded)
+		msg.post (string.format("s_loader#scene_%d", self.loaded), "unload")
+	end
+  print("event_load"..data.E_num)
+	msg.post (string.format("s_loader#scene_%d", data.E_num), "load")
+  self.loaded = data.E_num
+end
+
+function on_message(self, message_id, message,sender)
+	if(message_id == hash("new_scenario"))then
+		loadevent(self, message.level)
+	elseif message_id == hash("proxy_loaded")then
+		msg.post(sender, "enable")
+	elseif message_id == hash("debug") then
+		print(sender)
+   	end
+end

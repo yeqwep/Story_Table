@@ -1,0 +1,52 @@
+local gooey = require 'gooey.gooey'
+local kenneyblue = require 'gooey.themes.kenneyblue.kenneyblue'
+local data = require('main.data')
+local selected = 0
+
+function init(self)
+    gooey.acquire_input()
+    gui.set_enabled(gui.get_node('select'), false) --全体非表示
+    msg.post('#', 'hide') --全ボタン非表示
+    selected = 0
+end
+
+function on_message(self, message_id, message, sender)
+    if message_id == hash('show') then --シナリオスクリプトより
+        local b_num = 0
+        for _, s_data in ipairs(message) do --シナリオデータのセレクトボタンテキストを読み込む
+            b_num = b_num + 1 --読み込む回数計算
+            local b_nodes = gui.get_node(string.format('%s/bg', b_num))
+            local l_nodes = gui.get_node(string.format('%s/label', b_num))
+            gui.set_text(l_nodes, s_data) --ボタンにテキスト反映
+            gui.set_enabled(b_nodes, true) --読み込んだボタンだけ表示
+        end
+        gui.set_enabled(gui.get_node('select'), true) --全体表示
+    elseif message_id == hash('hide') then --全ボタン消す
+        for i = 1, 3, 1 do
+            local e = gui.get_node(string.format('%s/bg', i))
+            gui.set_enabled(e, false)
+        end
+    end
+end
+-- ボタン押した後の処理関数
+local function b_r(button)
+    if button.released_now then
+        msg.post('/s_common/scenario', 'select_f', {s = selected}) --押したボタンの数値をシナリオスクリプトへ
+        msg.post('#', 'hide') --全ボタン消す
+        gui.set_enabled(gui.get_node('select'), false) --全部消す
+    end
+end
+-- 入力
+function on_input(self, action_id, action)
+    local group =
+        kenneyblue.group(
+        'group2',
+        function()
+            for i = 1, 3, 1 do --ボタン三つの場合
+                selected = i
+                kenneyblue.button(i, action_id, action, b_r) --ボタンを押した後関数b_rへ移動
+            end
+        end
+    )
+    return group.consumed
+end

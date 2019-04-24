@@ -1,0 +1,231 @@
+local data = require('main.data')
+local rendercam = require 'rendercam.rendercam'
+local zoom_c = 0
+-- 読み込みデータ格納用
+local cut_num = 0
+local script = 0
+local s_para1 = {}
+local s_para2 = {}
+local bgm = 0
+local sound = 0
+local camera = 0
+local c_para = {}
+local cg_s = 0
+local cg1 = ''
+local cg2 = ''
+local background = ''
+--カメラポジション用
+local c_pos = vmath.vector3(0, 0, 0)
+-- 操作用
+local wait_time = 0 --０より大きいとき操作不可
+local nextok = false --次の行読み込みフラグ
+local readok = 0 --文末表示済フラグ 0文章読み前、1文章読み中、２読み完了、３処理待ち、４スキップ次のcut読込
+local clickok = false --クリック押しフラグ
+local selectok = false --選択肢待ちフラグ
+local jampok = false --ジャンプフラグ
+-- データ初期関数
+local function initscenario(self)
+    -- 読み込みデータ格納用　初期化
+    cut_num = 0
+    wait_time = 0
+    script = 0
+    s_para1 = {}
+    s_para2 = {}
+    bgm = 0
+    sound = 0
+    camera = 0
+    c_para = {}
+    cg_s = 0
+    cg1 = ''
+    cg2 = ''
+    background = ''
+    self.data_cut = 0 -- 読み込みデータの行
+    wait_time = 0
+    nextok = true
+    readok = 4 --読み込み開始
+    clickok = false
+    selectok = false
+    jampok = false
+    -- CG準備 透明
+    sprite.set_constant('/s_common/cg1#sprite', 'tint', vmath.vector4(1, 1, 1, 0))
+    sprite.set_constant('/s_common/cg2#sprite', 'tint', vmath.vector4(1, 1, 1, 0))
+    sprite.set_constant('/s_common/background#sprite', 'tint', vmath.vector4(1, 1, 1, 0))
+    -- カメラ位置初期化
+    c_pos = vmath.vector3(640, 360, 0)
+    -- go.set_position(c_pos, "/*01camera")
+end
+-- データ更新関数
+local function updatescenario(self)
+    self.data_cut = self.data_cut + 1 -- 次行のテーブルデータ取得
+    msg.post(string.format('/scene_data#s_data%d', data.E_num), 'getscenario', {line = self.data_cut})
+end
+
+local function updatescript(self)
+    print('data_cut' .. self.data_cut .. ',' .. 'script' .. script)
+    if script == 0 then --文章読み開始
+        readok = 0
+    elseif script == 1 then --スキップ　文章表示せずに次のcut読み込み
+        readok = 4
+    elseif script == 2 then -- GUIに連絡、文章のボタンを画面上に表示
+        readok = 3
+        msg.post('/s_common/01gui#cut_select', 'show', s_para2)
+    elseif script == 3 then -- ジャンプフラグtrueの時、読み込む行をジャンプ先に変更
+        if jampok == true then
+            jampok = false
+            self.data_cut = s_para1[1] - 1
+        end
+    elseif script == 4 then --変数値変更
+        data.atai[s_para1[1]] = s_para2[1]
+        pprint(data.atai)
+        readok = 4
+    elseif script == 5 then --変数が数値より大きい時true
+    elseif script == 6 then --変数が数値より小さい時true
+    elseif script == 7 then --変数が数値と同等の時ture
+    elseif script == 8 then
+    elseif script == 9 then --指定の別イベントコレクションへ移動
+        data.E_num = s_para1[1]
+        msg.post('scenario:/s_loader', 'new_scenario')
+    elseif script == 10 then --指定のコレクションへ移動(handlerに送るメッセージ)
+        msg.post('main:/handler', s_para1[1])
+    elseif script == 11 then --初期化
+        initscenario(self)
+    else
+    end
+end
+
+local function updatebgm(self)
+    if bgm == '' then
+    elseif bgm == '0' then
+        msg.post('main:/*12BGM', 'stop_sound')
+        print('stop bgm')
+    else
+        msg.post('main:/*12BGM', 'stop_sound')
+        msg.post(string.format('main:/*12BGM#%s', bgm), 'play_sound', {gain = 0.2})
+        print('play bgm')
+    end
+end
+
+local function updatese(self)
+    if sound == '' then
+    elseif sound == '0' then
+        msg.post('main:/*11sound', 'stop_sound')
+        print('stop sound')
+    else
+        msg.post('main:/*11sound', 'stop_sound')
+        msg.post(string.format('main:/*11sound#%s', sound), 'play_sound', {gain = 0.1})
+        print('play sound')
+    end
+end
+
+local function updatecamera(self)
+    if camera == 1 then
+        rendercam.shake(50, wait_time)
+        print('shake')
+    elseif camera == 2 then
+    elseif camera == 3 then
+        msg.post('/s_common/01gui#fade', 'toggle_fade', {})
+    end
+end
+
+local function updatecg1(self)
+    if cg1 == '' then
+    elseif cg1 == '0' then
+        sprite.set_constant('/s_common/cg1#sprite', 'tint', vmath.vector4(1, 1, 1, 0))
+    else
+        sprite.set_constant('/s_common/cg1#sprite', 'tint', vmath.vector4(1, 1, 1, 1))
+        msg.post('/s_common/cg1#sprite', 'play_animation', {id = hash(string.format('%s', cg1))})
+    end
+end
+
+local function updatecg2(self)
+    if cg2 == '' then
+    elseif cg2 == '0' then
+        sprite.set_constant('/s_common/cg2#sprite', 'tint', vmath.vector4(1, 1, 1, 0))
+    else
+        sprite.set_constant('/s_common/cg2#sprite', 'tint', vmath.vector4(1, 1, 1, 1))
+        msg.post('/s_common/cg2#sprite', 'play_animation', {id = hash(string.format('%s', cg2))})
+    end
+end
+
+local function updatebackground(self)
+    if background == '' then
+    elseif background == '0' then
+        sprite.set_constant('/s_common/background#sprite', 'tint', vmath.vector4(1, 1, 1, 0))
+    else
+        sprite.set_constant('/s_common/background#sprite', 'tint', vmath.vector4(1, 1, 1, 1))
+        msg.post('/s_common/background#sprite', 'play_animation', {id = hash(string.format('%s', background))})
+    end
+end
+
+function init(self)
+    msg.post('.', 'acquire_input_focus')
+    initscenario(self)
+end
+function update(self, dt)
+    if wait_time > 0 then
+        wait_time = wait_time - dt
+        print(wait_time)
+    elseif wait_time <= 0 then
+        wait_time = 0
+        if readok == 0 then --文章読み開始
+            print('read_start')
+            readok = 1 --文章読み中
+            msg.post('/s_common/01gui#scenario', 'script_ok')
+        elseif readok == 2 then --クリック待ち
+        elseif readok == 3 then --処理待ち
+        elseif readok == 4 then --スキップ　文章表示せずに次のcut読み込み
+            readok = 3
+            updatescenario(self)
+        end
+    end
+end
+
+function on_input(self, action_id, action)
+    if action.pressed then
+        if action_id == hash('touch') or hash('multi') then
+            if readok == 2 then --全文表示済みの時、次のデータ読み込み
+                readok = 3
+                updatescenario(self)
+            elseif readok == 1 then --文章読み中クリックで全文表示
+                msg.post('/s_common/01gui#scenario', 'skip_click')
+            end
+        end
+    end
+end
+
+function on_message(self, message_id, message, sender)
+    if (message_id == hash('recg')) then -- テーブルデータ取得 CG更新
+        cg_s = message[1]
+        cg1 = message[2]
+        cg2 = message[3]
+        background = message[4]
+        -- データ更新
+        updatecg1(self)
+        updatecg2(self)
+        updatebackground(self)
+    elseif (message_id == hash('rescenario')) then -- テーブルデータ取得 スクリプト更新
+        -- msg.post("main:/*11sound_click#page", "play_sound",{gain = 0.5})
+        cut_num = message[1]
+        wait_time = message[2]
+        script = message[3]
+        s_para1 = message[4]
+        s_para2 = message[5]
+        bgm = message[6]
+        sound = message[7]
+        camera = message[8]
+        c_para = message[9]
+        -- 各データ更新
+        updatebgm(self)
+        updatese(self)
+        updatecamera(self)
+        updatescript(self)
+    elseif (message_id == hash('read_f')) then --テキストGUIより文章全表示完了
+        readok = 2
+    elseif (message_id == hash('select_f')) then --セレクトGUIより選択ボタン押し完了
+        if readok == 3 then
+            print(message.s)
+            self.data_cut = s_para1[message.s] - 1 --押したボタンのインデックスより、ジャンプ先パラメータのインデックスを参照する
+            readok = 4
+        end
+    end
+end
