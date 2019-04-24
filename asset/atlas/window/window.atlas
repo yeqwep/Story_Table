@@ -1,0 +1,12 @@
+images {
+  image: "/asset/png/window/window_name.png"
+}
+images {
+  image: "/asset/png/window/m_windows.png"
+}
+images {
+  image: "/asset/png/window/sankaku.png"
+}
+margin: 0
+extrude_borders: 0
+inner_padding: 0

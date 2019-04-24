@@ -1,0 +1,23 @@
+animations {
+  id: "sa_t"
+  images {
+    image: "/asset/png/cg2/sa_t.png"
+  }
+  playback: PLAYBACK_NONE
+  fps: 60
+  flip_horizontal: 0
+  flip_vertical: 0
+}
+animations {
+  id: "sa_s"
+  images {
+    image: "/asset/png/cg2/sa_s.png"
+  }
+  playback: PLAYBACK_NONE
+  fps: 60
+  flip_horizontal: 0
+  flip_vertical: 0
+}
+margin: 0
+extrude_borders: 0
+inner_padding: 0

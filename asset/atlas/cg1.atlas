@@ -1,0 +1,33 @@
+animations {
+  id: "su_l"
+  images {
+    image: "/asset/png/cg1/su_l.png"
+  }
+  playback: PLAYBACK_LOOP_FORWARD
+  fps: 60
+  flip_horizontal: 0
+  flip_vertical: 0
+}
+animations {
+  id: "su_s"
+  images {
+    image: "/asset/png/cg1/su_s.png"
+  }
+  playback: PLAYBACK_LOOP_FORWARD
+  fps: 60
+  flip_horizontal: 0
+  flip_vertical: 0
+}
+animations {
+  id: "su_t"
+  images {
+    image: "/asset/png/cg1/su_t.png"
+  }
+  playback: PLAYBACK_LOOP_FORWARD
+  fps: 60
+  flip_horizontal: 0
+  flip_vertical: 0
+}
+margin: 0
+extrude_borders: 0
+inner_padding: 0
