@@ -1,0 +1,34 @@
+[project]
+title = Story_Tables
+version = 0.1
+compress_archive = 1
+dependencies = 
+
+[bootstrap]
+main_collection = /main/main.collectionc
+render = /rendercam/rendercam.renderc
+
+[input]
+game_binding = /input/game.input_bindingc
+
+[display]
+width = 1280
+height = 720
+fullscreen = 0
+high_dpi = 0
+dynamic_orientation = 0
+vsync = 0
+
+[script]
+shared_state = 1
+
+[android]
+package = com.test.test
+immersive_mode = 1
+
+[osx]
+bundle_identifier = example.test
+
+[sound]
+gain = 0.5
+

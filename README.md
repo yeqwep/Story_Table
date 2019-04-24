@@ -23,3 +23,4 @@
 - picture  : [**twitter**](https://twitter.com/sts7colors) by sts7colors
 - Background : [**Website**](https://www.pakutaso.com) by PAKUTASO
 - BGM & sound :  [**Website**](https://maoudamashii.jokersounds.com/music_rule.html) by maoudamashii
+- font :  [**Website**](http://azukifont.com/index.html) by azusa
