@@ -1,0 +1,25 @@
+local gooey = require "gooey.gooey"
+local kenneyblue = require "gooey.themes.kenneyblue.kenneyblue"
+local data = require ("main.data")
+
+local function show(self)
+	gui.set_enabled(self.node_t, true)
+	gui.animate(self.node_t, gui.PROP_POSITION, vmath.vector3(0, 0, 0), gui.EASING_INOUTQUAD, 0.5)
+end
+
+function init(self)
+	gooey.acquire_input()
+	self.node_t = gui.get_node("title")
+end
+
+function on_input(self, action_id, action)
+	local group = kenneyblue.group("group1", function()
+
+		kenneyblue.button("start", action_id, action, function(button)
+			data.E_num = 0
+			msg.post("main:/handler", "show_event")
+		end)
+	end)
+	return group.consumed
+end
+

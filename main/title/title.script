@@ -1,0 +1,8 @@
+local data = require ("main.data")
+function init(self)
+  -- フラグによりステータス変更
+  data.state = data.STATE_TITLE
+  -- コレクション名は固定
+  data.coll = "01title"
+  print(data.coll)
+end
