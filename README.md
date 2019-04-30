@@ -7,7 +7,8 @@
 
 日本人がDefoldを使うために必要な日本語テキスト表示方法の参考程度になると思います。  
 ![setumei](https://github.com/yeqwep/story_table/blob/master/setumei.png)  
-
+![setumei_ex](https://github.com/yeqwep/story_table/blob/master/setumei_ex.png)  
+![setumei_ex2](https://github.com/yeqwep/story_table/blob/master/setumei_ex2.png)  
 サンプルはこちら
 https://yeqwep.itch.io/test-defold-vn
 
