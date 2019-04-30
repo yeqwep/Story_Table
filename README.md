@@ -3,7 +3,8 @@
 
 ### 概要
 これはDefoldで作ったゲームにストーリーを追加するための
-簡単なテンプレートです。  
+簡単なテンプレートです。  (未完成)
+
 
 日本人がDefoldを使うために必要な日本語テキスト表示方法の参考程度になると思います。  
 ![setumei](https://github.com/yeqwep/story_table/blob/master/setumei.png)  
