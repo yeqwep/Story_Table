@@ -2,7 +2,6 @@ local data = require('main.data')
 local rendercam = require 'rendercam.rendercam'
 local zoom_c = 0
 -- 読み込みデータ格納用
-local cut_num = 0
 local script = 0
 local s_para1 = {}
 local s_para2 = {}
@@ -18,15 +17,19 @@ local background = ''
 local c_pos = vmath.vector3(0, 0, 0)
 -- 操作用
 local wait_time = 0 --０より大きいとき操作不可
-local nextok = false --次の行読み込みフラグ
+local reading = false --読んでるかフラグ
 local readok = 0 --文末表示済フラグ 0文章読み前、1文章読み中、２読み完了、３処理待ち、４スキップ次のcut読込
-local clickok = false --クリック押しフラグ
+local clickok = false --クリック待ちフラグ
 local selectok = false --選択肢待ちフラグ
 local jampok = false --ジャンプフラグ
+-- スキップ系
+local con_ok = true --操作可能フラグ
+local one_skip = false -- スキップフラグ　１回のみ文章読んだ後次の文章自動読み込み
+local auto_skip = false -- オートスキップフラグ オートボタンで早送り
 -- データ初期関数
 local function initscenario(self)
+    self.data_cut = data.cut_save -- 読み込みデータの行
     -- 読み込みデータ格納用　初期化
-    cut_num = 0
     wait_time = 0
     script = 0
     s_para1 = {}
@@ -39,35 +42,36 @@ local function initscenario(self)
     cg1 = ''
     cg2 = ''
     background = ''
-    self.data_cut = 0 -- 読み込みデータの行
+    -- 操作用
     wait_time = 0
-    nextok = true
+    reading = false
     readok = 4 --読み込み開始
     clickok = false
     selectok = false
     jampok = false
+    -- スキップ系
+    con_ok = true
+    one_skip = false
+    auto_skip = false
     -- CG準備 透明
     sprite.set_constant('/s_common/cg1#sprite', 'tint', vmath.vector4(1, 1, 1, 0))
     sprite.set_constant('/s_common/cg2#sprite', 'tint', vmath.vector4(1, 1, 1, 0))
     sprite.set_constant('/s_common/background#sprite', 'tint', vmath.vector4(1, 1, 1, 0))
     -- カメラ位置初期化
     c_pos = vmath.vector3(640, 360, 0)
-    -- go.set_position(c_pos, "/*01camera")
-end
--- データ更新関数
-local function updatescenario(self)
-    self.data_cut = self.data_cut + 1 -- 次行のテーブルデータ取得
-    msg.post(string.format('/scene_data#s_data%d', data.E_num), 'getscenario', {line = self.data_cut})
+    -- テーブル読み込み開始
+    msg.post('.', 'next_table')
 end
 
 local function updatescript(self)
     print('data_cut' .. self.data_cut .. ',' .. 'script' .. script)
     if script == 0 then --文章読み開始
-        readok = 0
+        clickok = true
+        reading = true
+        msg.post('/s_common/01gui#scenario', 'script_ok')
     elseif script == 1 then --スキップ　文章表示せずに次のcut読み込み
-        readok = 4
-    elseif script == 2 then -- GUIに連絡、文章のボタンを画面上に表示
-        readok = 3
+        msg.post('.', 'next_table')
+    elseif script == 2 then -- cut_selectに連絡、S_para2のボタンを画面上に表示
         msg.post('/s_common/01gui#cut_select', 'show', s_para2)
     elseif script == 3 then -- ジャンプフラグtrueの時、読み込む行をジャンプ先に変更
         if jampok == true then
@@ -77,7 +81,7 @@ local function updatescript(self)
     elseif script == 4 then --変数値変更
         data.atai[s_para1[1]] = s_para2[1]
         pprint(data.atai)
-        readok = 4
+        msg.post('.', 'next_table')
     elseif script == 5 then --変数が数値より大きい時true
     elseif script == 6 then --変数が数値より小さい時true
     elseif script == 7 then --変数が数値と同等の時ture
@@ -161,40 +165,40 @@ function init(self)
     msg.post('.', 'acquire_input_focus')
     initscenario(self)
 end
+
 function update(self, dt)
     if wait_time > 0 then
         wait_time = wait_time - dt
         print(wait_time)
     elseif wait_time <= 0 then
         wait_time = 0
-        if readok == 0 then --文章読み開始
-            print('read_start')
-            readok = 1 --文章読み中
-            msg.post('/s_common/01gui#scenario', 'script_ok')
-        elseif readok == 2 then --クリック待ち
-        elseif readok == 3 then --処理待ち
-        elseif readok == 4 then --スキップ　文章表示せずに次のcut読み込み
-            readok = 3
-            updatescenario(self)
-        end
     end
 end
-
 function on_input(self, action_id, action)
-    if action.pressed then
-        if action_id == hash('touch') or hash('multi') then
-            if readok == 2 then --全文表示済みの時、次のデータ読み込み
-                readok = 3
-                updatescenario(self)
-            elseif readok == 1 then --文章読み中クリックで全文表示
-                msg.post('/s_common/01gui#scenario', 'skip_click')
-            end
+    if clickok and reading then --文章読み中クリックで全文表示
+        if action.pressed and action_id == hash('touch') then
+            reading = false
+            msg.post('/s_common/01gui#scenario', 'skip_click')
+        elseif action.repeated and action_id == hash('space') then
+            reading = false
+            clickok = false
+            msg.post('.', 'next_table')
+            msg.post('/s_common/01gui#scenario', 'skip_click')
+        end
+    elseif clickok == true and reading == false then
+        if action.pressed and action_id == hash('touch') then
+            clickok = false
+            msg.post('.', 'next_table')
         end
     end
 end
 
 function on_message(self, message_id, message, sender)
-    if (message_id == hash('recg')) then -- テーブルデータ取得 CG更新
+    if (message_id == hash('next_table')) then -- テーブルデータ更新
+        data.cut_save = self.data_cut --読んだところまでセーブ
+        self.data_cut = self.data_cut + 1 -- 次行のテーブルデータ取得
+        msg.post(string.format('/scene_data#s_data%d', data.E_num), 'getscenario', {line = self.data_cut})
+    elseif (message_id == hash('recg')) then -- テーブルデータ取得 CG更新
         cg_s = message[1]
         cg1 = message[2]
         cg2 = message[3]
@@ -205,7 +209,7 @@ function on_message(self, message_id, message, sender)
         updatebackground(self)
     elseif (message_id == hash('rescenario')) then -- テーブルデータ取得 スクリプト更新
         -- msg.post("main:/*11sound_click#page", "play_sound",{gain = 0.5})
-        cut_num = message[1]
+        -- cut_num = message[1]
         wait_time = message[2]
         script = message[3]
         s_para1 = message[4]
@@ -220,12 +224,11 @@ function on_message(self, message_id, message, sender)
         updatecamera(self)
         updatescript(self)
     elseif (message_id == hash('read_f')) then --テキストGUIより文章全表示完了
-        readok = 2
+        reading = false
     elseif (message_id == hash('select_f')) then --セレクトGUIより選択ボタン押し完了
-        if readok == 3 then
-            print(message.s)
-            self.data_cut = s_para1[message.s] - 1 --押したボタンのインデックスより、ジャンプ先パラメータのインデックスを参照する
-            readok = 4
-        end
+        readok = 2
+        print(message.s)
+        self.data_cut = s_para1[message.s] - 1 --押したボタンのインデックスより、ジャンプ先パラメータのインデックスを参照する
+        msg.post('.', 'next_table')
     end
 end

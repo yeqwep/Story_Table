@@ -1,4 +1,3 @@
-
 -- MIT License
 
 -- Copyright (c) 2018 Ben James
@@ -25,7 +24,7 @@ local M = {}
 -- イベント番号、ADVパートの読み込みデータの切り替え用
 M.EVENT_NUM = 0
 -- イベントNo　ニューゲーム時0
-M.E_num = "0"
+M.E_num = '0'
 -- ゲームの状態　各番号により状態を判別
 M.STATE_TITLE = 1
 M.STATE_OPTION = 2
@@ -33,11 +32,12 @@ M.STATE_SCENE = 3
 
 M.state = M.STATE_TITLE
 -- コレクション状態
-M.coll = "title"
--- table[1.1] = 1
+M.coll = 'title'
 -- 変数
 M.atai = {}
--- イベントNo　ニューゲーム時0
+-- イベント行数　セーブできるようにする予定
+M.cut_save = 0
+-- イベントNo　ニューゲーム時0　セーブできるようにする予定
 M.E_num = 0
 
 return M
