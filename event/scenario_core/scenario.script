@@ -18,14 +18,11 @@ local c_pos = vmath.vector3(0, 0, 0)
 -- 操作用
 local wait_time = 0 --０より大きいとき操作不可
 local reading = false --読んでるかフラグ
-local readok = 0 --文末表示済フラグ 0文章読み前、1文章読み中、２読み完了、３処理待ち、４スキップ次のcut読込
 local clickok = false --クリック待ちフラグ
 local selectok = false --選択肢待ちフラグ
 local jampok = false --ジャンプフラグ
 -- スキップ系
 local con_ok = true --操作可能フラグ
-local one_skip = false -- スキップフラグ　１回のみ文章読んだ後次の文章自動読み込み
-local auto_skip = false -- オートスキップフラグ オートボタンで早送り
 -- データ初期関数
 local function initscenario(self)
     self.data_cut = data.cut_save -- 読み込みデータの行
@@ -45,14 +42,11 @@ local function initscenario(self)
     -- 操作用
     wait_time = 0
     reading = false
-    readok = 4 --読み込み開始
     clickok = false
     selectok = false
     jampok = false
     -- スキップ系
     con_ok = true
-    one_skip = false
-    auto_skip = false
     -- CG準備 透明
     sprite.set_constant('/s_common/cg1#sprite', 'tint', vmath.vector4(1, 1, 1, 0))
     sprite.set_constant('/s_common/cg2#sprite', 'tint', vmath.vector4(1, 1, 1, 0))
@@ -70,8 +64,10 @@ local function updatescript(self)
         reading = true
         msg.post('/s_common/01gui#scenario', 'script_ok')
     elseif script == 1 then --スキップ　文章表示せずに次のcut読み込み
+        clickok = false
         msg.post('.', 'next_table')
     elseif script == 2 then -- cut_selectに連絡、S_para2のボタンを画面上に表示
+        clickok = false
         msg.post('/s_common/01gui#cut_select', 'show', s_para2)
     elseif script == 3 then -- ジャンプフラグtrueの時、読み込む行をジャンプ先に変更
         if jampok == true then
@@ -87,11 +83,17 @@ local function updatescript(self)
     elseif script == 7 then --変数が数値と同等の時ture
     elseif script == 8 then
     elseif script == 9 then --指定の別イベントコレクションへ移動
+        clickok = false
+        data.cut_save = 0
         data.E_num = s_para1[1]
         msg.post('scenario:/s_loader', 'new_scenario')
     elseif script == 10 then --指定のコレクションへ移動(handlerに送るメッセージ)
+        clickok = false
+        data.cut_save = 0
         msg.post('main:/handler', s_para1[1])
     elseif script == 11 then --初期化
+        clickok = false
+        data.cut_save = 0
         initscenario(self)
     else
     end
@@ -127,7 +129,9 @@ local function updatecamera(self)
         print('shake')
     elseif camera == 2 then
     elseif camera == 3 then
-        msg.post('/s_common/01gui#fade', 'toggle_fade', {})
+        msg.post('/s_common/01gui#fade', 'fade_in', {})
+    elseif camera == 4 then
+        msg.post('/s_common/01gui#fade', 'fade_out', {})
     end
 end
 
@@ -173,16 +177,19 @@ function update(self, dt)
     elseif wait_time <= 0 then
         wait_time = 0
     end
+
+    if data.auto_skip and clickok and wait_time == 0 then
+        reading = false
+        clickok = false
+        msg.post('.', 'next_table')
+        msg.post('/s_common/01gui#scenario', 'skip_click')
+    end
 end
+
 function on_input(self, action_id, action)
-    if clickok and reading then --文章読み中クリックで全文表示
+    if clickok and reading and wait_time == 0 then --文章読み中クリックで全文表示
         if action.pressed and action_id == hash('touch') then
             reading = false
-            msg.post('/s_common/01gui#scenario', 'skip_click')
-        elseif action.repeated and action_id == hash('space') then
-            reading = false
-            clickok = false
-            msg.post('.', 'next_table')
             msg.post('/s_common/01gui#scenario', 'skip_click')
         end
     elseif clickok == true and reading == false then
@@ -226,7 +233,6 @@ function on_message(self, message_id, message, sender)
     elseif (message_id == hash('read_f')) then --テキストGUIより文章全表示完了
         reading = false
     elseif (message_id == hash('select_f')) then --セレクトGUIより選択ボタン押し完了
-        readok = 2
         print(message.s)
         self.data_cut = s_para1[message.s] - 1 --押したボタンのインデックスより、ジャンプ先パラメータのインデックスを参照する
         msg.post('.', 'next_table')

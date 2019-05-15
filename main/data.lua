@@ -21,10 +21,6 @@
 -- SOFTWARE.
 
 local M = {}
--- イベント番号、ADVパートの読み込みデータの切り替え用
-M.EVENT_NUM = 0
--- イベントNo　ニューゲーム時0
-M.E_num = '0'
 -- ゲームの状態　各番号により状態を判別
 M.STATE_TITLE = 1
 M.STATE_OPTION = 2
@@ -33,11 +29,16 @@ M.STATE_SCENE = 3
 M.state = M.STATE_TITLE
 -- コレクション状態
 M.coll = 'title'
--- 変数
-M.atai = {}
--- イベント行数　セーブできるようにする予定
-M.cut_save = 0
--- イベントNo　ニューゲーム時0　セーブできるようにする予定
-M.E_num = 0
+--↓セーブするやつ↓
+M.cut_save = 0 -- イベント行数　セーブできるようにする予定
+M.E_num = 0 -- イベントNo　ニューゲーム時0　セーブできるようにする予定
+M.atai = {} -- 変数
+--setting
+--自動送り
+M.auto_skip = false -- オートスキップフラグ 早送り
+M.auto_read = false -- 一定時間たつと次の行へ
+--音量
+M.musicvol = 1.0
+M.sfxvol = 1.0
 
 return M
