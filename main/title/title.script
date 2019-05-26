@@ -1,8 +1,10 @@
-local data = require ("main.data")
+local data = require('main.data')
 function init(self)
-  -- フラグによりステータス変更
-  data.state = data.STATE_TITLE
-  -- コレクション名は固定
-  data.coll = "01title"
-  print(data.coll)
+    -- フラグによりステータス変更
+    data.state = data.STATE_TITLE
+    -- コレクション名は固定
+    data.coll = '01title'
+    print(data.coll)
+    msg.post('main:/*12BGM', 'stop_sound')
+    msg.post('main:/*12BGM#healing08', 'play_sound', {gain = data.musicvol})
 end

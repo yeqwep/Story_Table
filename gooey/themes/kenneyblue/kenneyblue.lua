@@ -34,8 +34,9 @@ local function refresh_button(button)
 
   elseif button.over then
     gui.set_blend_mode(button.node, gui.BLEND_ALPHA)
+  elseif button.over == false then
+    gui.set_blend_mode(button.node,gui.BLEND_MULT)
   else
-    gui.set_blend_mode(button.node, gui.BLEND_MULT)
     gui.play_flipbook(button.node, BUTTON)
   end
 end

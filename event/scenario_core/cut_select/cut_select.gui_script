@@ -19,6 +19,7 @@ function on_message(self, message_id, message, sender)
             local l_nodes = gui.get_node(string.format('%s/label', b_num))
             gui.set_text(l_nodes, s_data) --ボタンにテキスト反映
             gui.set_enabled(b_nodes, true) --読み込んだボタンだけ表示
+            kenneyblue.button(b_num).set_BLEND_MULT(gui.BLEND_MULT)
         end
         gui.set_enabled(gui.get_node('select'), true) --全体表示
     elseif message_id == hash('hide') then --全ボタン消す

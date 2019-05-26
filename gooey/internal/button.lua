@@ -11,6 +11,10 @@ local BUTTON = {
 	set_visible = function(button, visible)
 		gui.set_enabled(button.node, visible)
 	end,
+	-- 表示を変える
+	set_BLEND_MULT = function(button,blend)
+		gui.set_blend_mode(button.node, blend)
+	end
 }
 
 function M.button(node_id, action_id, action, fn, refresh_fn)

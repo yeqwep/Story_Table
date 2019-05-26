@@ -1,16 +1,12 @@
-# 絵コンテ―ブル
-0.1
+# 絵コンテーブル STORY_TABLE
+0.3
 
 ### 概要
-これはDefoldで作ったゲームにストーリーを追加するための
-簡単なテンプレートです。  (未完成)
-
-
+これはDefoldで作ったビジュアルノベルのようなゲームにストーリーを追加するための  
+簡単なテンプレートです。  (未完成)  
 日本人がDefoldを使うために必要な日本語テキスト表示方法の参考程度になると思います。  
-![setumei](https://github.com/yeqwep/Story_Table/blob/master/setuimei.PNG)  
-![setumei_ex](https://github.com/yeqwep/Story_Table/blob/master/setumei_ex.PNG)  
-![setumei_ex2](https://github.com/yeqwep/Story_Table/blob/master/setumei_ex2.PNG)  
-サンプルはこちら
+
+サンプルはこちら  
 https://yeqwep.itch.io/test-defold-vn
 
 ### 特徴
@@ -20,7 +16,14 @@ https://yeqwep.itch.io/test-defold-vn
 - コマンド名は勝手につけてもいい（エクセルの関数とかDefoldスクリプトがわかる場合）
 - コマンドの種類を増やしてもいいし減らしてもいい（Defoldスクリプトがわかる場合）
 - サウンドノベルはもちろん、RPG、アクションのイベントパートに改造してもよい（Defoldスクリプトがわかる場合）
-- 新しい機能の追加もおそらく簡単（？）
+- 新しい機能の追加もおそらく簡単  
+
+### 考え方
+![setumei](https://github.com/yeqwep/Story_Table/blob/master/setuimei.PNG)  
+### エクセルを使ったストーリーの編集方法
+![setumei_ex](https://github.com/yeqwep/Story_Table/blob/master/setumei_ex.PNG)  
+![setumei_ex2](https://github.com/yeqwep/Story_Table/blob/master/setumei_ex2.PNG)  
+
 
 **Credits**
 - fade.gui_script : [**twitter**](https://twitter.com/Pkeod) by Pkeod

@@ -1,0 +1,71 @@
+local gooey = require 'gooey.gooey'
+local kenneyblue_control = require 'gooey.themes.kenneyblue_control.kenneyblue_control'
+local data = require('main.data')
+
+local text_time = 0 -- テキスト表示時間
+local t = nil -- テキストのノード名
+
+function init(self)
+    gooey.acquire_input()
+    gui.set_render_order(1) -- GUIレイヤーの前後
+    t = gui.get_node('text')
+    gui.set_color(t, vmath.vector4(1, 1, 1, 0)) -- テキスト消す
+-- ボタンの状態初期化
+    kenneyblue_control.button('save').set_BLEND_MULT(gui.BLEND_MULT)
+    kenneyblue_control.checkbox('skip').set_BLEND_MULT(gui.BLEND_MULT)
+    kenneyblue_control.checkbox('skip').set_checked(false)
+    kenneyblue_control.button('load').set_BLEND_MULT(gui.BLEND_MULT)
+end
+
+function update(self,dt)
+    if text_time > 0 then
+        text_time = text_time - dt
+        gui.set_color(t, vmath.vector4(1, 1, 1, text_time/2))
+    end
+end
+
+function on_input(self, action_id, action)
+    local group =
+        kenneyblue_control.group(
+        'group1',
+        function()
+            if data.con_ok == true and data.auto_skip == false then
+                kenneyblue_control.button(
+                    'save',
+                    action_id,
+                    action,
+                    function(button)
+                        data.savegamefile(self)
+                        print('save data')
+                        print(data.cut_save)
+                        gui.set_text(t, 'セーブしました')
+                        text_time = 2
+                    end
+                )
+                if data.validsavegame(self) ~= nil then
+                    kenneyblue_control.button(
+                        'load',
+                        action_id,
+                        action,
+                        function(button)
+                            data.loadgamefile(self)
+                            data.newgame = false
+                            print('load data')
+                            msg.post('scenario','push_load')
+                        end
+                    )
+                end
+            end
+            kenneyblue_control.checkbox(
+                'skip',
+                action_id,
+                action,
+                function(checkbox)
+                    print('auto_skip', checkbox.checked)
+                    data.auto_skip = checkbox.checked
+                end
+            )
+        end
+    )
+    return group.consumed
+end

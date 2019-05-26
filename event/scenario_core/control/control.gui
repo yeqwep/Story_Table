@@ -1,4 +1,4 @@
-script: "/main/title/title.gui_script"
+script: "/event/scenario_core/control/control.gui_script"
 fonts {
   name: "ja"
   font: "/asset/font/ja.font"
@@ -43,7 +43,7 @@ nodes {
   type: TYPE_BOX
   blend_mode: BLEND_MODE_ALPHA
   texture: ""
-  id: "title"
+  id: "control"
   xanchor: XANCHOR_NONE
   yanchor: YANCHOR_NONE
   pivot: PIVOT_CENTER
@@ -65,8 +65,8 @@ nodes {
 }
 nodes {
   position {
-    x: 640.0
-    y: 325.0
+    x: 950.0
+    y: 220.0
     z: 0.0
     w: 1.0
   }
@@ -95,12 +95,12 @@ nodes {
     w: 1.0
   }
   type: TYPE_TEMPLATE
-  id: "start"
-  parent: "title"
+  id: "save"
+  parent: "control"
   layer: ""
   inherit_alpha: true
   alpha: 1.0
-  template: "/gooey/themes/kenneyblue/components/button.gui"
+  template: "/gooey/themes/kenneyblue_control/components/button_s.gui"
   template_node_child: false
 }
 nodes {
@@ -123,8 +123,8 @@ nodes {
     w: 1.0
   }
   size {
-    x: 192.0
-    y: 51.0
+    x: 90.0
+    y: 40.0
     z: 0.0
     w: 1.0
   }
@@ -137,12 +137,12 @@ nodes {
   type: TYPE_BOX
   blend_mode: BLEND_MODE_ALPHA
   texture: "gooey/blue_button04"
-  id: "start/bg"
+  id: "save/bg"
   xanchor: XANCHOR_NONE
   yanchor: YANCHOR_NONE
   pivot: PIVOT_CENTER
   adjust_mode: ADJUST_MODE_FIT
-  parent: "start"
+  parent: "save"
   layer: "below"
   inherit_alpha: true
   slice9 {
@@ -156,7 +156,7 @@ nodes {
   clipping_inverted: false
   alpha: 1.0
   template_node_child: true
-  size_mode: SIZE_MODE_AUTO
+  size_mode: SIZE_MODE_MANUAL
 }
 nodes {
   position {
@@ -191,9 +191,9 @@ nodes {
   }
   type: TYPE_TEXT
   blend_mode: BLEND_MODE_ALPHA
-  text: "START"
-  font: "ja"
-  id: "start/label"
+  text: "SAVE"
+  font: "button_s"
+  id: "save/label"
   xanchor: XANCHOR_NONE
   yanchor: YANCHOR_NONE
   pivot: PIVOT_CENTER
@@ -211,7 +211,7 @@ nodes {
   }
   adjust_mode: ADJUST_MODE_FIT
   line_break: false
-  parent: "start/bg"
+  parent: "save/bg"
   layer: "text"
   inherit_alpha: true
   alpha: 1.0
@@ -224,126 +224,8 @@ nodes {
 }
 nodes {
   position {
-    x: 640.0
-    y: 500.0
-    z: 0.0
-    w: 1.0
-  }
-  rotation {
-    x: 0.0
-    y: 0.0
-    z: 0.0
-    w: 1.0
-  }
-  scale {
-    x: 1.0
-    y: 1.0
-    z: 1.0
-    w: 1.0
-  }
-  size {
-    x: 600.0
-    y: 100.0
-    z: 0.0
-    w: 1.0
-  }
-  color {
-    x: 0.5139747
-    y: 0.6716862
-    z: 0.73770493
-    w: 1.0
-  }
-  type: TYPE_BOX
-  blend_mode: BLEND_MODE_ALPHA
-  texture: ""
-  id: "logo"
-  xanchor: XANCHOR_NONE
-  yanchor: YANCHOR_NONE
-  pivot: PIVOT_CENTER
-  adjust_mode: ADJUST_MODE_FIT
-  parent: "title"
-  layer: ""
-  inherit_alpha: true
-  slice9 {
-    x: 0.0
-    y: 0.0
-    z: 0.0
-    w: 0.0
-  }
-  clipping_mode: CLIPPING_MODE_NONE
-  clipping_visible: true
-  clipping_inverted: false
-  alpha: 1.0
-  template_node_child: false
-  size_mode: SIZE_MODE_MANUAL
-}
-nodes {
-  position {
-    x: 640.0
-    y: 500.0
-    z: 0.0
-    w: 1.0
-  }
-  rotation {
-    x: 0.0
-    y: 0.0
-    z: 0.0
-    w: 1.0
-  }
-  scale {
-    x: 2.0
-    y: 2.0
-    z: 1.0
-    w: 1.0
-  }
-  size {
-    x: 200.0
-    y: 100.0
-    z: 0.0
-    w: 1.0
-  }
-  color {
-    x: 1.0
-    y: 1.0
-    z: 1.0
-    w: 1.0
-  }
-  type: TYPE_TEXT
-  blend_mode: BLEND_MODE_ALPHA
-  text: "Visual Novel Test"
-  font: "ja"
-  id: "text"
-  xanchor: XANCHOR_NONE
-  yanchor: YANCHOR_NONE
-  pivot: PIVOT_CENTER
-  outline {
-    x: 1.0
-    y: 1.0
-    z: 1.0
-    w: 1.0
-  }
-  shadow {
-    x: 1.0
-    y: 1.0
-    z: 1.0
-    w: 1.0
-  }
-  adjust_mode: ADJUST_MODE_FIT
-  line_break: false
-  parent: "title"
-  layer: ""
-  inherit_alpha: true
-  alpha: 1.0
-  outline_alpha: 1.0
-  shadow_alpha: 1.0
-  template_node_child: false
-  text_leading: 1.0
-  text_tracking: 0.0
-}
-nodes {
-  position {
-    x: 640.0
-    y: 225.0
+    x: 1050.0
+    y: 220.0
     z: 0.0
     w: 1.0
   }
@@ -373,11 +255,11 @@ nodes {
   }
   type: TYPE_TEMPLATE
   id: "load"
-  parent: "title"
+  parent: "control"
   layer: ""
   inherit_alpha: true
   alpha: 1.0
-  template: "/gooey/themes/kenneyblue/components/button.gui"
+  template: "/gooey/themes/kenneyblue_control/components/button_s.gui"
   template_node_child: false
 }
 nodes {
@@ -400,8 +282,8 @@ nodes {
     w: 1.0
   }
   size {
-    x: 192.0
-    y: 51.0
+    x: 90.0
+    y: 40.0
     z: 0.0
     w: 1.0
   }
@@ -433,7 +315,7 @@ nodes {
   clipping_inverted: false
   alpha: 1.0
   template_node_child: true
-  size_mode: SIZE_MODE_AUTO
+  size_mode: SIZE_MODE_MANUAL
 }
 nodes {
   position {
@@ -469,7 +351,7 @@ nodes {
   type: TYPE_TEXT
   blend_mode: BLEND_MODE_ALPHA
   text: "LOAD"
-  font: "ja"
+  font: "button_s"
   id: "load/label"
   xanchor: XANCHOR_NONE
   yanchor: YANCHOR_NONE
@@ -501,8 +383,8 @@ nodes {
 }
 nodes {
   position {
-    x: 640.0
-    y: 125.0
+    x: 1150.0
+    y: 220.0
     z: 0.0
     w: 1.0
   }
@@ -531,12 +413,12 @@ nodes {
     w: 1.0
   }
   type: TYPE_TEMPLATE
-  id: "option"
-  parent: "title"
+  id: "skip"
+  parent: "control"
   layer: ""
   inherit_alpha: true
   alpha: 1.0
-  template: "/gooey/themes/kenneyblue/components/button.gui"
+  template: "/gooey/themes/kenneyblue_control/components/button_skip.gui"
   template_node_child: false
 }
 nodes {
@@ -559,8 +441,8 @@ nodes {
     w: 1.0
   }
   size {
-    x: 192.0
-    y: 51.0
+    x: 90.0
+    y: 40.0
     z: 0.0
     w: 1.0
   }
@@ -573,26 +455,26 @@ nodes {
   type: TYPE_BOX
   blend_mode: BLEND_MODE_ALPHA
   texture: "gooey/blue_button04"
-  id: "option/bg"
+  id: "skip/box"
   xanchor: XANCHOR_NONE
   yanchor: YANCHOR_NONE
   pivot: PIVOT_CENTER
   adjust_mode: ADJUST_MODE_FIT
-  parent: "option"
+  parent: "skip"
   layer: "below"
   inherit_alpha: true
   slice9 {
-    x: 6.0
-    y: 6.0
-    z: 6.0
-    w: 10.0
+    x: 0.0
+    y: 0.0
+    z: 0.0
+    w: 0.0
   }
   clipping_mode: CLIPPING_MODE_NONE
   clipping_visible: true
   clipping_inverted: false
   alpha: 1.0
   template_node_child: true
-  size_mode: SIZE_MODE_AUTO
+  size_mode: SIZE_MODE_MANUAL
 }
 nodes {
   position {
@@ -627,9 +509,9 @@ nodes {
   }
   type: TYPE_TEXT
   blend_mode: BLEND_MODE_ALPHA
-  text: "OPTION"
-  font: "ja"
-  id: "option/label"
+  text: "SKIP"
+  font: "button_s"
+  id: "skip/label"
   xanchor: XANCHOR_NONE
   yanchor: YANCHOR_NONE
   pivot: PIVOT_CENTER
@@ -647,7 +529,7 @@ nodes {
   }
   adjust_mode: ADJUST_MODE_FIT
   line_break: false
-  parent: "option/bg"
+  parent: "skip"
   layer: "text"
   inherit_alpha: true
   alpha: 1.0
@@ -657,6 +539,125 @@ nodes {
   template_node_child: true
   text_leading: 1.0
   text_tracking: 0.0
+}
+nodes {
+  position {
+    x: 850.0
+    y: 190.0
+    z: 0.0
+    w: 1.0
+  }
+  rotation {
+    x: 0.0
+    y: 0.0
+    z: 0.0
+    w: 1.0
+  }
+  scale {
+    x: 1.0
+    y: 1.0
+    z: 1.0
+    w: 1.0
+  }
+  size {
+    x: 400.0
+    y: 120.0
+    z: 0.0
+    w: 1.0
+  }
+  color {
+    x: 0.101960786
+    y: 0.101960786
+    z: 0.101960786
+    w: 1.0
+  }
+  type: TYPE_BOX
+  blend_mode: BLEND_MODE_ALPHA
+  texture: ""
+  id: "back"
+  xanchor: XANCHOR_NONE
+  yanchor: YANCHOR_NONE
+  pivot: PIVOT_SW
+  adjust_mode: ADJUST_MODE_FIT
+  layer: "back"
+  inherit_alpha: true
+  slice9 {
+    x: 0.0
+    y: 0.0
+    z: 0.0
+    w: 0.0
+  }
+  clipping_mode: CLIPPING_MODE_NONE
+  clipping_visible: true
+  clipping_inverted: false
+  alpha: 0.2
+  template_node_child: false
+  size_mode: SIZE_MODE_MANUAL
+}
+nodes {
+  position {
+    x: 910.0
+    y: 278.0
+    z: 0.0
+    w: 1.0
+  }
+  rotation {
+    x: 0.0
+    y: 0.0
+    z: 0.0
+    w: 1.0
+  }
+  scale {
+    x: 1.0
+    y: 1.0
+    z: 1.0
+    w: 1.0
+  }
+  size {
+    x: 200.0
+    y: 100.0
+    z: 0.0
+    w: 1.0
+  }
+  color {
+    x: 1.0
+    y: 1.0
+    z: 1.0
+    w: 1.0
+  }
+  type: TYPE_TEXT
+  blend_mode: BLEND_MODE_ALPHA
+  text: "<text>"
+  font: "ja"
+  id: "text"
+  xanchor: XANCHOR_NONE
+  yanchor: YANCHOR_NONE
+  pivot: PIVOT_W
+  outline {
+    x: 0.0
+    y: 0.0
+    z: 0.0
+    w: 1.0
+  }
+  shadow {
+    x: 0.0
+    y: 0.0
+    z: 0.0
+    w: 1.0
+  }
+  adjust_mode: ADJUST_MODE_FIT
+  line_break: false
+  layer: "text"
+  inherit_alpha: true
+  alpha: 1.0
+  outline_alpha: 0.11
+  shadow_alpha: 0.21
+  template_node_child: false
+  text_leading: 1.0
+  text_tracking: 0.0
+}
+layers {
+  name: "back"
 }
 layers {
   name: "below"

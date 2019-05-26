@@ -1,0 +1,89 @@
+local gooey = require 'gooey.gooey'
+local kenneyblue = require 'gooey.themes.kenneyblue.kenneyblue'
+local data = require('main.data')
+local musicvol_t = nil
+local sfxvol_t = nil
+local mp = 0
+local sp = 0
+
+local function disablenode(self, node)
+    gui.set_enabled(node, false)
+end
+
+local function show(self)
+    gui.set_enabled(self.node_o, true)
+    gui.animate(self.node_o, gui.PROP_POSITION, vmath.vector3(0, 0, 0), gui.EASING_INOUTQUAD, 0.5)
+end
+
+local function hide(self)
+    gui.animate(self.node_o, gui.PROP_POSITION, vmath.vector3(-1280, 0, 0), gui.EASING_INOUTQUAD, 0.5, 0, disablenode)
+end
+
+function init(self)
+    msg.post('.', 'acquire_input_focus')
+    gooey.acquire_input()
+    self.node_o = gui.get_node('option')
+    gui.set_position(self.node_o, vmath.vector3(-1280, 0, 0))
+    gui.set_enabled(self.node_o, false)
+    --音量調整
+    musicvol_t = gui.get_node('musicvol_num')
+    sfxvol_t = gui.get_node('sfxvol_num')
+    mp = string.format('%d', data.musicvol * 100)
+    sp = string.format('%d', data.sfxvol * 100)
+    gui.set_text(musicvol_t, mp)
+    gui.set_text(sfxvol_t, sp)
+end
+
+function on_input(self, action_id, action)
+    --音量調整ボタンを押したとき
+    if action_id == hash('touch') and action.pressed then
+        local m_up = gui.get_node('m_up')
+        local m_down = gui.get_node('m_down')
+        local s_up = gui.get_node('s_up')
+        local s_down = gui.get_node('s_down')
+
+        if gui.pick_node(m_up, action.x, action.y) and data.musicvol < 1 then
+            data.musicvol = data.musicvol + 0.1
+            msg.post('main:/*11sound#onepoint17', 'play_sound', {gain = data.sfxvol})
+        elseif gui.pick_node(m_down, action.x, action.y) and data.musicvol > 0.1 then
+            data.musicvol = data.musicvol - 0.1
+            msg.post('main:/*11sound#onepoint17', 'play_sound', {gain = data.sfxvol})
+        elseif gui.pick_node(s_up, action.x, action.y) and data.sfxvol < 1 then
+            data.sfxvol = data.sfxvol + 0.1
+            msg.post('main:/*11sound#onepoint17', 'play_sound', {gain = data.sfxvol})
+        elseif gui.pick_node(s_down, action.x, action.y) and data.sfxvol > 0.1 then
+            data.sfxvol = data.sfxvol - 0.1
+            msg.post('main:/*11sound#onepoint17', 'play_sound', {gain = data.sfxvol})
+        end
+        mp = string.format('%d', data.musicvol * 100)
+        sp = string.format('%d', data.sfxvol * 100)
+        msg.post('main:/*12BGM#healing08', 'set_gain', {gain = data.musicvol})
+        gui.set_text(musicvol_t, mp)
+        gui.set_text(sfxvol_t, sp)
+    end
+    --backボタンを押したとき
+    local group =
+        kenneyblue.group(
+        'group2',
+        function()
+            kenneyblue.button(
+                'back',
+                action_id,
+                action,
+                function(button)
+                    data.savesettings(self)
+                    hide(self)
+                    data.state = data.STATE_TITLE
+                    msg.post('#title', 'show', {})
+                end
+            )
+        end
+    )
+    return group.consumed
+end
+
+function on_message(self, message_id, message, sender)
+    if message_id == hash('show') then
+        show(self)
+    end
+end

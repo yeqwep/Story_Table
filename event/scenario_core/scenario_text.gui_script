@@ -105,6 +105,16 @@ local function read(self)
     -- end
 end
 
+local function del(self)
+    -- 次の文章読む前に文章を消す
+    for i = 1, 3, 1 do
+        local t = gui.get_node(string.format('textline_%s', i))
+        gui.set_text(t, '')
+    end
+    -- 表示文字一時保管用データを消す
+    show_words = ''
+end
+
 -- 文章表示中にクリックすると読むのスキップして全文表示
 local function skip_click(self)
     -- ３行全部表示
@@ -133,5 +143,8 @@ function on_message(self, message_id, message, sender)
     elseif message_id == hash('skip_click') then --シナリオスクリプトから
         push_mark(self) --プッシュマーク表示
         skip_click(self)
+    elseif message_id == hash('del') then
+        push_mark(self) --プッシュマーク非表示、位置初期化
+        del(self)
     end
 end

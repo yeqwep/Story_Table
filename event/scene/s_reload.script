@@ -1,0 +1,14 @@
+local data = require('main.data')
+local wait = 0.1
+function init(self)
+	wait = 0.1
+end
+
+function update(self,dt)
+	if wait > 0 then
+		wait = wait - dt
+	else
+		msg.post('scenario:/s_loader', 'new_scenario')
+	end
+end
+

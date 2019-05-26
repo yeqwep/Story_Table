@@ -1,0 +1,9 @@
+images {
+  image: "/main/title/option/images/down.png"
+}
+images {
+  image: "/main/title/option/images/up.png"
+}
+margin: 0
+extrude_borders: 0
+inner_padding: 0
