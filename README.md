@@ -35,3 +35,11 @@ https://yeqwep.itch.io/test-defold-vn
 - Background : [**Website**](https://www.pakutaso.com) by PAKUTASO
 - BGM & sound :  [**Website**](https://maoudamashii.jokersounds.com/music_rule.html) by maoudamashii
 - font :  [**Website**](http://azukifont.com/index.html) by azusa
+
+  背景素材について
+  このテンプレートで使用している背景写真は、
+  ぱくたそ(www.pakutaso.com）の写真素材を利用しています。
+  二次配布物の受領者がこの写真を継続して利用する場合は、
+  ぱくたそ公式サイトからご自身でダウンロードしていただくか、
+  ぱくたそのご利用規約(www.pakutaso.com/userpolicy.html）に同意していただく必要があります。
+  同意いただけない場合は写真素材のご利用はできませんのでご注意ください。
